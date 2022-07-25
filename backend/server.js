@@ -1,4 +1,6 @@
 const Hapi = require('@hapi/hapi');
+const {readNFiles, myEventEmitter} = require('./frameRead');
+const {routes} = require('./route');
 
 const init = async () => {
   const server = Hapi.server({
@@ -8,10 +10,16 @@ const init = async () => {
       cors: true,
     },
   });
+  server.route(routes);
 
   await server.start();
 
   console.log(`Server berjalan pada ${server.info.uri}`);
+  myEventEmitter.emit('used', 1);
 };
 
+
 init();
+myEventEmitter.on('used', readNFiles);
+
+
