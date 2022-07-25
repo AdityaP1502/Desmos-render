@@ -1,11 +1,12 @@
-from time import time, sleep
+from time import time
 import cv2
 import numpy as np
 import multiprocessing
 import potrace
-import preprocess
 import sys
-import threading
+import preprocess
+from loadingAnimation import Loading, Color
+
 
 # FILTER RESULT : https://colab.research.google.com/drive/11YfMxNxRO7i2qGXt0SngsUwLUyB5tROe?usp=sharing
 
@@ -168,7 +169,7 @@ class Process():
         time_remaining_m = (time_remaining % 3600) // 60
         time_remaining_s = (time_remaining % 3600) % 60
         
-        sys.stdout.write('\r'+'loading...  process '+str(n_finished.value)+'/'+str(n_files)+' '+ '{:.2f}'.format(n_finished.value/n_files*100)+'%' + "Time remaining {:.2f}h, {:.2f}m, {:.2f}s".format(time_remaining_h, time_remaining_m, time_remaining_s))
+        sys.stdout.write('\r'+Color.print_colored('loading...', utils=["bold"]) + '  process '+str(n_finished.value)+'/'+str(n_files)+' '+ '{:.2f}'.format(n_finished.value/n_files*100)+'%' + " " + Color.print_colored("Time remaining:", color_fg=[120, 10, 0], utils=["bold"]) + " {:.2f}h, {:.2f}m, {:.2f}s".format(time_remaining_h, time_remaining_m, time_remaining_s))
         return exprs
     
     @staticmethod
@@ -184,8 +185,8 @@ class Process():
 
             f.write(line)
             f.close()
-            
-        print("Done!")
+           
+        print(Color.print_colored("\rDone!                    ", color_fg=[100, 10, 0], utils = ["bold"]))
         preprocess.Preprocess.changeDir(dir)
         
     def start(self):
@@ -197,11 +198,12 @@ class Process():
         preprocess.Preprocess.changeDir(curr_dir + IN_PATH)
 
         # frame files
-        n, batch = len(preprocess.listdir()), 0
+        n, batch = len(preprocess.listdir()), 3
         n_batch = n // N_PER_BATCH + 1 if n % N_PER_BATCH > 1 else 0
         self.n = n
         
         while batch < n_batch:
+            print(Color.print_colored("\rProcessing", color_fg=[10, 120, 10], utils=["bold"]) + " {}th batch".format(batch + 1))
             frameFiles = ["out{}.png".format(batch * N_PER_BATCH + i + 1) for i in range(min(N_PER_BATCH, n - n_finished.value))]
             start_time = time()
             self.start_time = start_time
@@ -220,7 +222,7 @@ class Process():
             sys.stdout.flush()
             print()
             print("Done! Batch = {} / {}. Took about {:.2f} hours {:.2f} minutes {:.2f} seconds".format(batch + 1, n_batch, elapsed_time_h, elapsed_time_m, elapsed_time_s))
-            print(f"Writting Latex Expressions to file in {temp + OUT_PATH}")
+            print(f"Writting Latex Expressions to file in " + Color.print_colored(f"{temp + OUT_PATH}"))
             print("Please Wait")
             
             self.writeToFile(temp, frameFiles, batch)
@@ -231,20 +233,13 @@ class Process():
             preprocess.Preprocess.changeDir(curr_dir + IN_PATH)
             
     
-def animated_loading():
-    chars = "/—\|" 
-    for char in chars:
-        sys.stdout.write('\r'+'loading...'+char)
-        sleep(.1)
-        sys.stdout.flush() 
+
 
 
 if __name__ == "__main__":
     proc = Process()
-    s = threading.Thread(name='process', target=proc.start, daemon=True)
-    s.start()
-
-    while s.is_alive():
-        animated_loading()
+    Loading.loading(proc.start)
+    
+    print("All Images has been processed")
     
     
