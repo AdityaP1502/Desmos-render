@@ -24,4 +24,13 @@ const frameHandler = (request, h) => {
   return response;
 };
 
-module.exports = {frameHandler};
+const init = (request, h) => {
+  return h.response({
+    status: 'success',
+    message: 'Berhasil membuat koneksi dengan server',
+  })
+      .type('application/json')
+      .code(200);
+};
+
+module.exports = {frameHandler, init};
