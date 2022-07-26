@@ -1,6 +1,11 @@
-const {frameHandler} = require('./handler');
+const {frameHandler, init} = require('./handler');
 
 const routes = [
+  {
+    method: 'GET',
+    path: '/init',
+    handler: init,
+  },
   {
     method: 'GET',
     path: '/frames/{frame}',
