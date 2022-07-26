@@ -1,0 +1,70 @@
+<script src=
+"https://www.desmos.com/api/v1.7/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6">
+</script>
+<div id="calculator" style="width: 100%; height: 100%;"></div>
+<script>
+  const changeGraph = (key, exprs, frame) => {
+    calculator.setExpression( { id: 'frame', latex: 'f=' + (frame) } );
+    /* Delete Expression */
+    // Delete expression
+    while (key > 0) {
+      calculator.removeExpression({id: 'expr-' + key});
+      key--;
+    };
+
+    console.log(exprs[0]);
+    /* Set Expression */
+    for (let i = 0; i < exprs.length; i++) {
+      calculator.setExpression({ id: 'expr-' + key, latex: exprs[i], color: '#6042a6'});
+      key++;
+    }
+
+    return key;
+  };
+
+  const renderFrame = (frame) => {
+    let key = 0;
+    let bottom = 1;
+    let up = 1;
+    let payload;
+
+    const interval = setInterval(() => {
+      // If there still data available, render from storage
+      if (frame < up) {
+        key = changeGraph(key, payload.data.framesExprs[frame - bottom], frame);
+        frame++; 
+
+      } else {
+        xhr = new XMLHttpRequest();
+        xhr.open('GET', `http://localhost:5000/frames/${frame}`);
+        xhr.send();
+        xhr.onload = (e) => {
+          payload = JSON.parse(xhr.response);
+          console.log(payload.data.framesExprs);
+          if (payload.data.frameExprs === null) {
+            clearInterval(interval);
+          }
+          bottom = frame;
+          up += payload.data.N_FRAMES;
+        }
+      }                       
+    }, 1000);
+  }
+
+  var elt = document.getElementById('calculator');
+  var calculator = Desmos.GraphingCalculator(elt);
+
+  xhr = new XMLHttpRequest();
+  xhr.open('GET', 'http://localhost:5000/init');
+  xhr.send()
+  xhr.onload = (e) => {
+    calculator.setExpression({ id: 'frame', latex: `f=0`, color: '#2464b4'});
+    var f = calculator.HelperExpression({ latex: 'f' });
+
+    f.observe('numericValue', () => {
+        if (Number.isNaN(f.numericValue) || f.numericValue <= 0) return;
+        f.unobserve('numericValue');
+        setTimeout(() => renderFrame(f.numericValue), 3000); // Wait for additional keystrokes
+    });
+  };
+</script>
