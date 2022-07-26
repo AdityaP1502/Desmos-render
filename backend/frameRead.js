@@ -1,6 +1,6 @@
 /* Read Frames Latex Expressions from Files */
 
-const N_PER_BLOCK = 10;
+const N_PER_BLOCK = 40;
 const fs = require('fs');
 const path = require('path');
 const {EventEmitter} = require('events');

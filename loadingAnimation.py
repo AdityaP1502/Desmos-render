@@ -1,5 +1,5 @@
 from os import system
-from time import time, sleep
+from time import sleep
 import sys
 import threading
 
@@ -12,7 +12,6 @@ class Color():
     "underline": "\u001b[4m",
     "reverse": "\u001b[7m",
   }
-  
   
   @staticmethod
   def __setFG(r, g, b):

@@ -222,7 +222,7 @@ class Process():
             sys.stdout.flush()
             print()
             print("Done! Batch = {} / {}. Took about {:.2f} hours {:.2f} minutes {:.2f} seconds".format(batch + 1, n_batch, elapsed_time_h, elapsed_time_m, elapsed_time_s))
-            print(f"Writting Latex Expressions to file in " + Color.print_colored(f"{temp + OUT_PATH}"))
+            print(f"Writting Latex Expressions to file in " + Color.print_colored(f"{temp + OUT_PATH}", color_fg =[10, 120, 20]))
             print("Please Wait")
             
             self.writeToFile(temp, frameFiles, batch)
@@ -232,10 +232,6 @@ class Process():
             
             preprocess.Preprocess.changeDir(curr_dir + IN_PATH)
             
-    
-
-
-
 if __name__ == "__main__":
     proc = Process()
     Loading.loading(proc.start)
