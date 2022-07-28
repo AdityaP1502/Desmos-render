@@ -18,7 +18,11 @@
       calculator.setExpression({ id: 'expr-' + key, latex: exprs[i], color: '#6042a6'});
       key++;
     }
-
+    console.log('Done!');
+    // let img = document.createElement('img');
+    // img.width = 200;
+    // img.height = 200;
+    // img.src = captureScreenshot();
     return key;
   };
 
@@ -32,28 +36,50 @@
       // If there still data available, render from storage
       if (frame < up) {
         key = changeGraph(key, payload.data.framesExprs[frame - bottom], frame);
-        frame++; 
+        const img = captureScreenshot();
 
+        // Send img to backend server
+        xhr = new XMLHttpRequest();
+        xhr.open('POST', `http://localhost:5000/images?frame=${frame}`);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.send(JSON.stringify({
+          data: {
+            uri: img,
+          },
+        }));
+
+        xhr.onload = (e) => {
+          console.log(xhr.response);
+        }
+
+        frame++;
       } else {
         xhr = new XMLHttpRequest();
-        xhr.open('GET', `http://localhost:5000/frames/${frame}`);
+        xhr.open('GET', `http://localhost:5000/frames?frame=${frame}`);
         xhr.send();
         xhr.onload = (e) => {
           payload = JSON.parse(xhr.response);
+          console.log(payload);
           console.log(payload.data.framesExprs);
-          if (payload.data.frameExprs === null) {
+          if (payload.data.framesExprs.length === 0) {
             clearInterval(interval);
           }
           bottom = frame;
           up += payload.data.N_FRAMES;
         }
       }                       
-    }, 1000);
-  }
+    }, 10000);
+  };
+
+  const captureScreenshot = () => {
+    const img = calculator.screenshot();
+    console.log(img);
+    return img;
+  };
 
   var elt = document.getElementById('calculator');
   var calculator = Desmos.GraphingCalculator(elt);
-
+  
   xhr = new XMLHttpRequest();
   xhr.open('GET', 'http://localhost:5000/init');
   xhr.send()
