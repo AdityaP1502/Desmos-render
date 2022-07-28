@@ -1,4 +1,4 @@
-const {frameHandler, init} = require('./handler');
+const {frameHandler, init, saveImagesHandler} = require('./handler');
 
 const routes = [
   {
@@ -8,8 +8,13 @@ const routes = [
   },
   {
     method: 'GET',
-    path: '/frames/{frame}',
+    path: '/frames',
     handler: frameHandler,
+  },
+  {
+    method: 'POST',
+    path: '/images',
+    handler: saveImagesHandler,
   },
 ];
 
