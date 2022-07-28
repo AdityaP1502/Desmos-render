@@ -1,3 +1,4 @@
+from fileinput import filename
 from time import time
 import cv2
 import numpy as np
@@ -18,8 +19,6 @@ from loadingAnimation import Loading, Color
 """
 
 n_finished = multiprocessing.Value('i', 0)
-OUT_PATH = "/out_latex/video1"
-IN_PATH = "/Downloaded_Videos/video1"
 N_PER_BATCH = 1000
 
 class Image():
@@ -144,9 +143,14 @@ class Image():
         return expr
 
 class Process():
-    def __init__(self) -> None:
+    def __init__(self, in_path, out_path, filename, filetype) -> None:
        self.n = 0
        self.start_time = 0
+       self.IN_PATH = in_path
+       self.OUT_PATH = out_path
+       self.FILENAME = filename
+       self.FILETYPE = filetype
+       
     
     def getLatexExpr(self, filename):
         img = Image(filename)
@@ -172,10 +176,9 @@ class Process():
         sys.stdout.write('\r'+Color.print_colored('loading...', utils=["bold"]) + '  process '+str(n_finished.value)+'/'+str(n_files)+' '+ '{:.2f}'.format(n_finished.value/n_files*100)+'%' + " " + Color.print_colored("Time remaining:", color_fg=[120, 10, 0], utils=["bold"]) + " {:.2f}h, {:.2f}m, {:.2f}s".format(time_remaining_h, time_remaining_m, time_remaining_s))
         return exprs
     
-    @staticmethod
-    def writeToFile(dir, frameFiles, batch):
+    def writeToFile(self, dir, frameFiles, batch):
         filename, filetype = "out{}", ".txt"
-        preprocess.Preprocess.changeDir(dir + OUT_PATH)
+        preprocess.Preprocess.changeDir(self.OUT_PATH)
 
         for (i, exprs) in enumerate(frameFiles):
             f = open(filename.format(batch * N_PER_BATCH + i + 1) + filetype, 'w')
@@ -191,20 +194,19 @@ class Process():
         
     def start(self):
         # Open the image 
-
+        print("Starting...")
         # change the path dir 
         temp = preprocess.getcwd()
-        curr_dir = temp
-        preprocess.Preprocess.changeDir(curr_dir + IN_PATH)
+        preprocess.Preprocess.changeDir(self.IN_PATH)
 
         # frame files
-        n, batch = len(preprocess.listdir()), 3
+        n, batch = len(preprocess.listdir()), 0
         n_batch = n // N_PER_BATCH + 1 if n % N_PER_BATCH > 1 else 0
         self.n = n
         
         while batch < n_batch:
             print(Color.print_colored("\rProcessing", color_fg=[10, 120, 10], utils=["bold"]) + " {}th batch".format(batch + 1))
-            frameFiles = ["out{}.png".format(batch * N_PER_BATCH + i + 1) for i in range(min(N_PER_BATCH, n - n_finished.value))]
+            frameFiles = ["{}{}.{}".format(self.FILENAME, batch * N_PER_BATCH + i + 1, self.FILETYPE) for i in range(min(N_PER_BATCH, n - n_finished.value))]
             start_time = time()
             self.start_time = start_time
 
@@ -222,7 +224,7 @@ class Process():
             sys.stdout.flush()
             print()
             print("Done! Batch = {} / {}. Took about {:.2f} hours {:.2f} minutes {:.2f} seconds".format(batch + 1, n_batch, elapsed_time_h, elapsed_time_m, elapsed_time_s))
-            print(f"Writting Latex Expressions to file in " + Color.print_colored(f"{temp + OUT_PATH}", color_fg =[10, 120, 20]))
+            print(f"Writting Latex Expressions to file in " + Color.print_colored(f"{self.OUT_PATH}", color_fg =[10, 10, 120]))
             print("Please Wait")
             
             self.writeToFile(temp, frameFiles, batch)
@@ -230,12 +232,7 @@ class Process():
             batch += 1
             n_finished.value = 0
             
-            preprocess.Preprocess.changeDir(curr_dir + IN_PATH)
+            preprocess.Preprocess.changeDir(self.IN_PATH)
             
-if __name__ == "__main__":
-    proc = Process()
-    Loading.loading(proc.start)
-    
-    print("All Images has been processed")
     
     

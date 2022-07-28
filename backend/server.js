@@ -1,5 +1,5 @@
 const Hapi = require('@hapi/hapi');
-const {readNFiles, myEventEmitter} = require('./frameRead');
+const {readNFiles, myEventEmitter} = require('./fileHandler');
 const {routes} = require('./route');
 
 const init = async () => {
