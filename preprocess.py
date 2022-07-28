@@ -1,4 +1,5 @@
-from os import system, getcwd, walk, chdir, mkdir, listdir
+from os import system, getcwd, chdir, mkdir, listdir
+from loadingAnimation import Color
 
 class Preprocess():
     """
@@ -10,9 +11,11 @@ class Preprocess():
             chdir(filepath)
             
         except:
-            print("Creating Downloaded_Videos Folder")
+            folder = filepath.strip("/")[-1]
+            print(Color.print_colored("Creating", utils=["bold"]) + Color.print_colored(" {}".format(folder), color_fg=[200, 120, 10]))
             mkdir(filepath)
-            print("Folder Succesfully created")
+            
+            print("Folder" + Color.print_colored(" Succesfully", color_fg=[0, 120, 0]) + " created")
             
             chdir(filepath)       
 
@@ -49,6 +52,7 @@ class Preprocess():
         temp = getcwd()
         in_path = vids_path
         out_path = temp + "/out_latex/{}".format(vids_name)
+        out_path_img = temp + "/out_png/{}".format(vids_name)
         
         cls.changeDir(in_path)
         
@@ -57,7 +61,7 @@ class Preprocess():
         system(cmd)
         chdir(temp)
         
-        return in_path, out_path
+        return in_path, out_path, out_path_img
     
 
 if __name__ == "__main__":

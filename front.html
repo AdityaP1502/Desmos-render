@@ -61,14 +61,14 @@
           payload = JSON.parse(xhr.response);
           console.log(payload);
           console.log(payload.data.framesExprs);
-          if (payload.data.framesExprs.length === 0) {
+          if (payload.data.framesExprs === null) {
             clearInterval(interval);
           }
           bottom = frame;
           up += payload.data.N_FRAMES;
         }
       }                       
-    }, 10000);
+    }, 30000);
   };
 
   const captureScreenshot = () => {
@@ -84,8 +84,10 @@
   xhr.open('GET', 'http://localhost:5000/init');
   xhr.send()
   xhr.onload = (e) => {
-    calculator.setExpression({ id: 'frame', latex: `f=0`, color: '#2464b4'});
-    var f = calculator.HelperExpression({ latex: 'f' });
+    let payload = JSON.parse(xhr.response);
+    let total_frames = payload.data.frame_count;
+    calculator.setExpression({ id: 'frame', latex: `f=0`, color: '#2464b4', sliderBounds: { step: 1, max: total_frames, min: 0 }});
+    var f = calculator.HelperExpression({ latex: 'f', });
 
     f.observe('numericValue', () => {
         if (Number.isNaN(f.numericValue) || f.numericValue <= 0) return;
