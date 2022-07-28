@@ -1,8 +1,8 @@
-const {N_PER_BLOCK, framesExprs, myEventEmitter} = require('./frameRead');
+const {N_PER_BLOCK, framesExprs, myEventEmitter,
+  writeImages} = require('./fileHandler');
 
 const frameHandler = (request, h) => {
-  const {frame} = request.params;
-
+  const {frame} = request.query;
   const temp = framesExprs.slice();
   framesExprs.splice(0, framesExprs.length);
 
@@ -33,4 +33,33 @@ const init = (request, h) => {
       .code(200);
 };
 
-module.exports = {frameHandler, init};
+const saveImagesHandler = (request, h) => {
+  // Front end will send a data URI in base64
+  console.log('Data received');
+  console.log(request.payload);
+  const {data: {uri}} = request.payload;
+  const {frame} = request.query;
+
+  try {
+    const data = uri.split(',')[1];
+    const buf = Buffer.from(data, 'base64');
+    writeImages(buf, frame);
+  } catch (e) {
+    console.log(e);
+    return h.response({
+      status: 'fail',
+      message: 'Error',
+    })
+        .type('application/json')
+        .code(500);
+  }
+
+  return h.response({
+    status: 'success',
+    message: `Berhasil menyimpan frame ${frame}`,
+  })
+      .type('application/json')
+      .code(201);
+};
+
+module.exports = {frameHandler, init, saveImagesHandler};
