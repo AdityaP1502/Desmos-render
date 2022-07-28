@@ -1,5 +1,6 @@
 const {N_PER_BLOCK, framesExprs, myEventEmitter,
-  writeImages} = require('./fileHandler');
+  writeImages,
+  FRAME_COUNT} = require('./fileHandler');
 
 const frameHandler = (request, h) => {
   const {frame} = request.query;
@@ -28,6 +29,9 @@ const init = (request, h) => {
   return h.response({
     status: 'success',
     message: 'Berhasil membuat koneksi dengan server',
+    data: {
+      frame_count: FRAME_COUNT,
+    },
   })
       .type('application/json')
       .code(200);
