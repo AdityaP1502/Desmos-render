@@ -69,6 +69,8 @@ class Loading():
 
     while s.is_alive():
         cls.__animated_loading()
-  
+        
+    return s
+
   
 
