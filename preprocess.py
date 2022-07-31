@@ -4,19 +4,21 @@ from loadingAnimation import Color
 class Preprocess():
     """
         Class to download and process the video into images
-    """    
+    """
     @staticmethod
-    def changeDir(filepath):
+    def makeDir(filepath):
+        folder = filepath.split("/")[-1]
+        print(Color.print_colored("Creating", utils=["bold"]) + Color.print_colored(" {}".format(folder), color_fg=[200, 120, 10]))
+        mkdir(filepath)
+        print("Folder" + Color.print_colored(" Succesfully", color_fg=[0, 120, 0]) + " created")
+
+    @classmethod
+    def changeDir(cls, filepath):
         try:
             chdir(filepath)
             
         except:
-            folder = filepath.strip("/")[-1]
-            print(Color.print_colored("Creating", utils=["bold"]) + Color.print_colored(" {}".format(folder), color_fg=[200, 120, 10]))
-            mkdir(filepath)
-            
-            print("Folder" + Color.print_colored(" Succesfully", color_fg=[0, 120, 0]) + " created")
-            
+            cls.makeDir(filepath)
             chdir(filepath)       
 
     @classmethod
@@ -50,17 +52,19 @@ class Preprocess():
         vids_path, vids_name, vids_ext = cls.getVideos(url)
         
         temp = getcwd()
-        in_path = vids_path
+        
+        in_path = temp + "/frames/{}".format(vids_name)
         out_path = temp + "/out_latex/{}".format(vids_name)
         out_path_img = temp + "/out_png/{}".format(vids_name)
         
-        cls.changeDir(in_path)
+        # create out_path_img if not exist
+        cls.changeDir(out_path_img)
+        cls.changeDir(vids_path)
         
-        cmd = "ffmpeg -i {}.{} -vf fps={} {}%d.{}".format(vids_name, vids_ext, fps, filename, filetype)
-        
+        cmd = "ffmpeg -i {}.{} -vf fps={} {}/{}%d.{}".format(vids_name, vids_ext, fps, in_path, filename, filetype)
         system(cmd)
-        chdir(temp)
         
+        chdir(temp)
         return in_path, out_path, out_path_img
     
 
