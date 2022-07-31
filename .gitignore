@@ -5,3 +5,5 @@ token
 __pycache__
 out_png
 test
+frames
+renderOneFrame.html

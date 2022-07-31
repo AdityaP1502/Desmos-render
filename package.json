@@ -4,7 +4,8 @@
   "description": "Backend server to handle frame request",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -L ./backend/server.js"
+    "start": "nodemon -L ./backend/server.js",
+    "test":  "python3 start.py --path=\"/test /out_png/test\" --latex=\"/out_latex/test\""
   },
   "keywords": [],
   "author": "",
