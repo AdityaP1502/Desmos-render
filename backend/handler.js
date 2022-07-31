@@ -1,9 +1,30 @@
-const {N_PER_BLOCK, framesExprs, myEventEmitter,
-  writeImages,
-  FRAME_COUNT} = require('./fileHandler');
+const {N_FRAMES, framesExprs, myEventEmitter,
+  writeImages, FRAME_COUNT, START_FRAMES} = require('./fileHandler');
+
+let CURR_FRAMES_BOTTOM = START_FRAMES;
 
 const frameHandler = (request, h) => {
-  const {frame} = request.query;
+  let {frame} = request.query;
+  frame = Number(frame);
+
+  if (frame < CURR_FRAMES_BOTTOM || frame > CURR_FRAMES_BOTTOM + N_FRAMES - 1) {
+    return h.response({
+      status: 'fail',
+      // eslint-disable-next-line max-len
+      message: `Frame request is below ${CURR_FRAMES_BOTTOM} or exceed ${CURR_FRAMES_BOTTOM + N_FRAMES - 1} `,
+    })
+        .type('application/json')
+        .code(500);
+  }
+  if (frame > FRAME_COUNT) {
+    return h.response({
+      status: 'fail',
+      message: 'Accessing frame that does not exist',
+    })
+        .type('application/json')
+        .code(500);
+  }
+
   const temp = framesExprs.slice();
   framesExprs.splice(0, framesExprs.length);
 
@@ -11,16 +32,20 @@ const frameHandler = (request, h) => {
   const response = h.response({
     status: 'Success',
     data: {
-      N_FRAMES: N_PER_BLOCK,
+      N_FRAMES,
       framesExprs: temp,
     },
   });
   response.type('application/json');
   response.code(200);
 
-  setTimeout(() => {
-    myEventEmitter.emit('used', Number(frame) + N_PER_BLOCK + 1);
-  }, 5000);
+  CURR_FRAMES_BOTTOM = frame + N_FRAMES;
+  if (CURR_FRAMES_BOTTOM <= FRAME_COUNT) {
+    // if there still data to be read
+    setTimeout(() => {
+      myEventEmitter.emit('used', CURR_FRAMES_BOTTOM);
+    }, 5000);
+  }
 
   return response;
 };
@@ -39,8 +64,6 @@ const init = (request, h) => {
 
 const saveImagesHandler = (request, h) => {
   // Front end will send a data URI in base64
-  console.log('Data received');
-  console.log(request.payload);
   const {data: {uri}} = request.payload;
   const {frame} = request.query;
 
