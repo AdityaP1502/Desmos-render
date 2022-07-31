@@ -1,5 +1,5 @@
 const Hapi = require('@hapi/hapi');
-const {readNFiles, myEventEmitter} = require('./fileHandler');
+const {readNFiles, myEventEmitter, START_FRAMES} = require('./fileHandler');
 const {routes} = require('./route');
 
 const init = async () => {
@@ -15,7 +15,7 @@ const init = async () => {
   await server.start();
 
   console.log(`Server berjalan pada ${server.info.uri}`);
-  myEventEmitter.emit('used', 1);
+  myEventEmitter.emit('used', START_FRAMES);
 };
 
 
