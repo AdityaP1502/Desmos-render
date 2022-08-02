@@ -43,8 +43,13 @@ class Preprocess():
         
         return filepath, filename, ext
     
+    @classmethod
+    def convertVideosIntoFrames(cls, vid_path, frame_path, fps=24, filename="out", filetype="png"):
+        
+        cmd = "ffmpeg -i {} -vf fps={} {}/{}%d.{}".format(vid_path, fps, frame_path, filename, filetype)
+        system(cmd)
     @classmethod    
-    def convertVideoIntoFrames(cls, url : str, fps=24, filename="out", filetype="png"):
+    def convertVideoIntoFramesFromURL(cls, url : str, fps=24, filename="out", filetype="png"):
         """
         Convert Video File to Frames Using FFMPEG
         """
@@ -56,9 +61,11 @@ class Preprocess():
         in_path = temp + "/frames/{}".format(vids_name)
         out_path = temp + "/out_latex/{}".format(vids_name)
         out_path_img = temp + "/out_png/{}".format(vids_name)
-        
+        # create in_path if not exist
+        cls.changeDir(in_path)
         # create out_path_img if not exist
         cls.changeDir(out_path_img)
+        
         cls.changeDir(vids_path)
         
         cmd = "ffmpeg -i {}.{} -vf fps={} {}/{}%d.{}".format(vids_name, vids_ext, fps, in_path, filename, filetype)
@@ -70,5 +77,5 @@ class Preprocess():
 
 if __name__ == "__main__":
     url = "https://www.youtube.com/watch?v=4QXCPuwBz2E"
-    img = Preprocess.convertVideoIntoFrames(url)
+    img = Preprocess.convertVideoIntoFramesFromURL(url)
     
