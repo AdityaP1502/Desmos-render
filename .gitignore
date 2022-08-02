@@ -6,4 +6,5 @@ __pycache__
 out_png
 test
 frames
+videos
 renderOneFrame.html
