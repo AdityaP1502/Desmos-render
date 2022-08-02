@@ -15,7 +15,7 @@
     console.log(exprs.length);
     /* Set Expression */
     for (let i = 0; i < exprs.length; i++) {
-      console.log(exprs[i]);
+      console.log(i);
       calculator.setExpression({ id: 'expr-' + key, latex: exprs[i], color: '#6042a6'});
       key++;
     }
@@ -23,21 +23,18 @@
     // let img = document.createElement('img');
     // img.width = 200;
     // img.height = 200;
-    // img.src = captureScreenshot();
+    // img.src = captureScreenshot(); 
     return key;
   };
-
-  const renderFrame = (frame) => {
-    let key = 0;
-    let bottom = 1;
-    let up = 1;
-    let payload;
-
-    const interval = setInterval(() => {
-      // If there still data available, render from storage
-      if (frame < up) {
-        key = changeGraph(key, payload.data.framesExprs[frame - bottom], frame);
-        setTimeout(() => {
+  
+  const renderFrame = (frame, paramObj) => {
+    console.log(frame, paramObj);
+    if (frame < paramObj.up) {
+      paramObj.key = changeGraph(paramObj.key, paramObj.payload.data.framesExprs[frame - paramObj.bottom], frame);
+      const rate = 5000; // expression / minutes
+      const time = (paramObj.payload.data.framesExprs[frame - paramObj.bottom].length / rate) * 60000;
+      console.log(time);
+      setTimeout(() => {
           const img = captureScreenshot();
 
           // Send img to backend server
@@ -53,26 +50,67 @@
           xhr.onload = (e) => {
             console.log(xhr.response);
           }
-
-          frame++;
-        }, 60000);
-
-      } else {
-        xhr = new XMLHttpRequest();
+        }, time);
+        // const rateRender = 2000 // in expression / minutes
+        // const timeRender = (paramObj.payload.data.framesExprs[(frame) - paramObj.bottom].length / rateRender) * 60000;
+        setTimeout(renderFrame, 5000, frame + 1, paramObj);
+    } else {
+      xhr = new XMLHttpRequest();
         xhr.open('GET', `http://localhost:5000/frames?frame=${frame}`);
         xhr.send();
         xhr.onload = (e) => {
-          payload = JSON.parse(xhr.response);
-          console.log(payload);
-          console.log(payload.data.framesExprs);
-          if (payload.data.framesExprs === null) {
-            clearInterval(interval);
-          }
-          bottom = frame;
-          up += payload.data.N_FRAMES;
-        }
-      }                       
-    }, 300000);
+          paramObj.payload = JSON.parse(xhr.response);
+          console.log(paramObj.payload);
+		  if (paramObj.payload.status === 'success') {
+			paramObj.bottom = frame;
+			paramObj.up += paramObj.payload.data.N_FRAMES;
+
+			const rate = 2000 // in expression / second
+			const time = paramObj.payload.data.framesExprs[frame - paramObj.bottom].length / rate;
+			setTimeout(renderFrame, time, frame, paramObj);
+		}    
+	}
+  }
+    // const interval = setInterval(() => {
+      // // If there still data available, render from storage
+      // if (frame < up) {
+        // key = changeGraph(key, payload.data.framesExprs[frame - bottom], frame);
+        // setTimeout(() => {
+          // const img = captureScreenshot();
+
+          // // Send img to backend server
+          // xhr = new XMLHttpRequest();
+          // xhr.open('POST', `http://localhost:5000/images?frame=${frame}`);
+          // xhr.setRequestHeader('Content-Type', 'application/json');
+          // xhr.send(JSON.stringify({
+            // data: {
+              // uri: img,
+            // },
+          // }));
+
+          // xhr.onload = (e) => {
+            // console.log(xhr.response);
+          // }
+
+          // frame++;
+        // }, 60000);
+
+      // } else {
+        // xhr = new XMLHttpRequest();
+        // xhr.open('GET', `http://localhost:5000/frames?frame=${frame}`);
+        // xhr.send();
+        // xhr.onload = (e) => {
+          // payload = JSON.parse(xhr.response);
+          // console.log(payload);
+          // console.log(payload.data.framesExprs);
+          // if (payload.data.framesExprs === null) {
+            // clearInterval(interval);
+          // }
+          // bottom = frame;
+          // up += payload.data.N_FRAMES;
+        // }
+      // }                       
+    // }, 300000);
   };
 
   const captureScreenshot = () => {
@@ -83,20 +121,27 @@
 
   var elt = document.getElementById('calculator');
   var calculator = Desmos.GraphingCalculator(elt);
-  
+  const paramObj = {
+    key : 0,
+    bottom : 1,
+    up : 1,
+    payload : null,
+  }
   xhr = new XMLHttpRequest();
   xhr.open('GET', 'http://localhost:5000/init');
   xhr.send()
   xhr.onload = (e) => {
     let payload = JSON.parse(xhr.response);
-    let total_frames = payload.data.frame_count;
-    calculator.setExpression({ id: 'frame', latex: `f=0`, color: '#2464b4', sliderBounds: { step: 1, max: total_frames, min: 0 }});
+    const {frameCount, startFrames, block} = payload.data;
+    paramObj.bottom = startFrames;
+    paramObj.up = paramObj.bottom;
+    calculator.setExpression({ id: 'frame', latex: `f=0`, color: '#2464b4', sliderBounds: { step: 1, max: frameCount, min: 0 }});
     var f = calculator.HelperExpression({ latex: 'f', });
 
     f.observe('numericValue', () => {
         if (Number.isNaN(f.numericValue) || f.numericValue <= 0) return;
         f.unobserve('numericValue');
-        setTimeout(() => renderFrame(f.numericValue), 3000); // Wait for additional keystrokes
+        setTimeout(() => renderFrame(f.numericValue, paramObj), 3000); // Wait for additional keystrokes
     });
   };
 </script>
