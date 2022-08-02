@@ -15,6 +15,7 @@ FILENAME = "out"
 FILETYPE = "png"
 OUT_PATH_LATEX = "{}/out_latex/default".format(getcwd())
 OUT_PATH_IMAGES = "{}/out_png/default".format(getcwd())
+VID_PATH = ""
 
 def showInfo():
   print(Color.print_colored("INPUT_PATH:", utils=["bold"]), end=" ")
@@ -31,9 +32,11 @@ def showHelp():
           -h : show help screen
           -f : filename. Default = \"out\"
           -e : extension. Default = \"png\"
-          --url=<youtube_url> : Youtube video link that want to be processed
-          --fps=<frame_per_second> : FPS of the output video
-          --path="<frame_path> <out_path_images>": Frame input path. Use relative path. If path specified, latex file will be at "/out_latex/default", change this using --latex option.
+          --url=<youtube_url> : Youtube video link that want to be processed. Use this option if you want to render video from youtube. If you use this options, no need to specify path
+          --vid_path=<video_path>: Video path using relative path. Specify this option if you want to render using existing video. Use --frame_path, --out_path_images, and --latex to specify output location
+          --fps=<frame_per_second> : FPS of the output video.
+          --frame_path=<frame_path> Frame input path(Use relative path).
+          --out_path_images=<out_images_path>: Desmos rendered frames location. Default location /out_png/default.
           --latex=<out_latex_path>. Use this to specify latex output path when using --path option. 
           --batch_size=<size>: How many frames want to be computed per batch before save to a file. 
           --edge_method=<edge_detect_method>. Specify the method that want to be used to detect edges. Available option are:    1. canny
@@ -43,7 +46,7 @@ def showHelp():
   
 if __name__ == "__main__":
   try:
-    opts, args = getopt.getopt(argv[1:], shortopts="hf:e:", longopts=["fps=", "url=", "path=", "latex=", "batch_size=", "edge_method="])
+    opts, args = getopt.getopt(argv[1:], shortopts="hf:e:", longopts=["fps=", "url=", "vid_path=", "frame_path=", "out_path_images=", "latex=", "batch_size=", "edge_method="])
   except getopt.GetoptError as err:
     print(err)
     print("Error : Invalid Argument")
@@ -62,22 +65,36 @@ if __name__ == "__main__":
       print(Color.print_colored("URL:", utils=["bold"]), end=" ")
       print(Color.print_colored("{}".format(URL), color_fg=[10, 20, 150]))
       
+    elif opt == "vid_path":
+      VID_PATH = arg
+      
     elif opt == "--fps":
       FPS = arg
       
-    elif opt=="--path":
-      temp = arg.split(" ")
-      IN_PATH = getcwd() + temp[0]
-      OUT_PATH_IMAGES = getcwd() + temp[1]
+    # elif opt=="--path":
+      # temp = arg.split(" ")
+      # IN_PATH = getcwd() + temp[0]
+      # OUT_PATH_IMAGES = getcwd() + temp[1]
       
-      # make sure out_path_images exist
+      # # make sure out_path_images exist
+      # temp = getcwd()
+      # Preprocess.changeDir(OUT_PATH_IMAGES)
+      # chdir(temp)
+      
+    elif opt == "--frame_path":
       temp = getcwd()
+      IN_PATH = temp + arg
+      Preprocess.changeDir(IN_PATH)
+      chdir(temp)
+      
+    elif opt == "--out_path_images":
+      temp = getcwd()
+      OUT_PATH_IMAGES = temp + arg 
       Preprocess.changeDir(OUT_PATH_IMAGES)
       chdir(temp)
         
     elif opt == "--latex":
       OUT_PATH_LATEX = getcwd() + arg
-      
       
     elif opt == "-f":
       FILENAME = arg
@@ -88,9 +105,15 @@ if __name__ == "__main__":
     elif opt == "--edge_method":
       METHOD = arg
       
+    elif opt == "--vid_path":
+      VID_PATH = getcwd() + arg
+      
       
   if URL != "":
-    IN_PATH, OUT_PATH_LATEX, OUT_PATH_IMAGES = Preprocess.convertVideoIntoFrames(URL, FPS, FILENAME, FILETYPE)  
+    IN_PATH, OUT_PATH_LATEX, OUT_PATH_IMAGES = Preprocess.convertVideoIntoFramesFromURL(URL, FPS, FILENAME, FILETYPE)  
+    
+  elif VID_PATH != "" and IN_PATH != "":
+    Preprocess.convertVideosIntoFrames(VID_PATH, IN_PATH, FPS)
     
   else:
     if IN_PATH == "":
