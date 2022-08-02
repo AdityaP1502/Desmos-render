@@ -4,8 +4,10 @@ const {N_FRAMES, framesExprs, myEventEmitter,
 let CURR_FRAMES_BOTTOM = START_FRAMES;
 
 const frameHandler = (request, h) => {
+  const date = new Date().toISOString();
   let {frame} = request.query;
   frame = Number(frame);
+  console.log(`${date}: Received GET request frame : ${frame}`);
 
   if (frame < CURR_FRAMES_BOTTOM || frame > CURR_FRAMES_BOTTOM + N_FRAMES - 1) {
     return h.response({
@@ -30,7 +32,7 @@ const frameHandler = (request, h) => {
 
   // Send response
   const response = h.response({
-    status: 'Success',
+    status: 'success',
     data: {
       N_FRAMES,
       framesExprs: temp,
@@ -51,11 +53,15 @@ const frameHandler = (request, h) => {
 };
 
 const init = (request, h) => {
+  const date = new Date().toISOString();
+  console.log(`${date} : Initialaizing connection`);
   return h.response({
     status: 'success',
     message: 'Berhasil membuat koneksi dengan server',
     data: {
-      frame_count: FRAME_COUNT,
+      frameCount: FRAME_COUNT,
+      startFrames: START_FRAMES,
+      block: N_FRAMES,
     },
   })
       .type('application/json')
@@ -64,8 +70,10 @@ const init = (request, h) => {
 
 const saveImagesHandler = (request, h) => {
   // Front end will send a data URI in base64
+  const date = new Date().toISOString();
   const {data: {uri}} = request.payload;
   const {frame} = request.query;
+  console.log(`${date}: Received POST request saving frame : ${frame}`);
 
   try {
     const data = uri.split(',')[1];
