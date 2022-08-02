@@ -12,7 +12,7 @@ let IMAGES_OUT_PATH = '';
 let N_PER_BLOCK = 0;
 let FRAME_COUNT = 0;
 let N_FRAMES = 0;
-let START_FRAMES = 0;
+let START_FRAMES = 1;
 
 
 const myEventEmitter = new EventEmitter();
@@ -30,16 +30,17 @@ const readArgument = () => {
     process.argv.splice(0, 2);
     if (process.argv.length >= 4) {
       [IN_PATH, IMAGES_OUT_PATH, frameMax, N_PER_BLOCK, _] = process.argv;
-      FRAME_COUNT += parseInt(frameMax);
+      FRAME_COUNT = parseInt(frameMax);
+      // eslint-disable-next-line max-len
       N_PER_BLOCK = parseInt(N_PER_BLOCK);
-
       // Initialize N_FRAMES
       N_FRAMES = Math.min(N_PER_BLOCK, (FRAME_COUNT));
 
       console.log(`Input path: ${IN_PATH}; Output path: ${IMAGES_OUT_PATH}`);
       console.log(`Total frames: ${FRAME_COUNT}`);
 
-      if (_ !== undefined) START_FRAMES = _;
+      if (_ !== undefined) START_FRAMES = parseInt(_);
+
       console.log(`Start Frames: ${START_FRAMES}`);
       return;
     }
@@ -54,11 +55,10 @@ const readArgument = () => {
 
 const readNFiles = (start) => {
   N_FRAMES = Math.min(N_PER_BLOCK, (FRAME_COUNT - start + 1));
-
   // eslint-disable-next-line max-len
-  for (let i = start; i < start + N_FRAMES; i++) {
+  for (let i = 0; i < N_FRAMES; i++) {
     const exprs = [];
-    readFrameExpression(i, exprs);
+    readFrameExpression(start + i, exprs);
     // eslint-disable-next-line max-len
     framesExprs.push(exprs);
   }
