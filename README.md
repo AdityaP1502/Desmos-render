@@ -61,12 +61,12 @@ if accurate render is set, then laplacian filter will use adaptive threshold met
 2. numpy
 3. opencv
 
-### 3. Running
+## 3. Running
 Here is how to run the script
 ```shell
 python3 start.py (specify options that want to be used. Read 3.1)
 ```
-#### 3.1. Options
+### 3.1. Options
 | ARGS | Details |
 | :--- | :--- |
 | -g | Only download video from youtube
@@ -91,7 +91,7 @@ python3 start.py (specify options that want to be used. Read 3.1)
 	* __out_images_path=/out_png/video_name__
 * To be able to process images there need to be __--url__, __--frame_path__, or __--vid_path__ specified. If not, the program will stop
 
-#### 3.2. Example
+### 3.2. Example
 ```shell
 python3 start.py --url=https://www.youtube.com/watch?v=GQ3V50XoLOM --fps=10 --batch_size=500 --edge_method=combine --accurate
 ```
