@@ -1,5 +1,5 @@
 # Backend connection
-To run the backend connection without processing the frame can achieved by running
+To run the backend connection without processing the frame can achieved by running this command in directory contains backend folder. 
 ```shell
 node ./backend/server.js <in_path> <out_path> <total_frames> <batch_size> [start_frame]
 ```
