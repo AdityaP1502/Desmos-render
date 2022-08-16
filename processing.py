@@ -19,7 +19,7 @@ n_finished_batch = multiprocessing.Value('i', 0)
 N_FILES = multiprocessing.Value('i', 0)
 
 class Process():
-    def __init__(self, in_path, out_path, filename, filetype, n_per_batch, method) -> None:
+    def __init__(self, in_path, out_path, filename, filetype, n_per_batch, method, th_method, accurate) -> None:
        self.n = 0
        self.start_time = 0
        self.IN_PATH = in_path
@@ -28,10 +28,11 @@ class Process():
        self.FILETYPE = filetype
        self.N_PER_BATCH = n_per_batch
        self.method = method
+       self.THRESHOLD_METHOD = th_method
+       self.accurate = accurate
        
-    
     def processExpression(self, filename):
-        exprs = Image.getLatexExpression(filename, self.method)
+        exprs = Image.getLatexExpression(filename, self.method, self.THRESHOLD_METHOD, self.accurate)
         
         with n_finished.get_lock():
             n_finished_batch.value += 1
