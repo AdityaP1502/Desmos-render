@@ -50,27 +50,29 @@
           xhr.onload = (e) => {
             console.log(xhr.response);
           }
+		  
+		      renderFrame(frame + 1, paramObj);
         }, time);
         // const rateRender = 2000 // in expression / minutes
         // const timeRender = (paramObj.payload.data.framesExprs[(frame) - paramObj.bottom].length / rateRender) * 60000;
-        setTimeout(renderFrame, 5000, frame + 1, paramObj);
+        
     } else {
       xhr = new XMLHttpRequest();
-        xhr.open('GET', `http://localhost:5000/frames?frame=${frame}`);
-        xhr.send();
-        xhr.onload = (e) => {
-          paramObj.payload = JSON.parse(xhr.response);
-          console.log(paramObj.payload);
-		  if (paramObj.payload.status === 'success') {
-			paramObj.bottom = frame;
-			paramObj.up += paramObj.payload.data.N_FRAMES;
-
-			const rate = 2000 // in expression / second
-			const time = paramObj.payload.data.framesExprs[frame - paramObj.bottom].length / rate;
-			setTimeout(renderFrame, time, frame, paramObj);
-		}    
-	}
-  }
+      xhr.open('GET', `http://localhost:5000/frames?frame=${frame}`);
+      xhr.send();
+      xhr.onload = (e) => {
+        paramObj.payload = JSON.parse(xhr.response);
+        console.log(paramObj.payload);
+		    if (paramObj.payload.status === 'success') {
+			  paramObj.bottom = frame;
+			  paramObj.up += paramObj.payload.data.N_FRAMES;
+			  // const rate = 2000 // in expression / second
+			  // const time = paramObj.payload.data.framesExprs[frame - paramObj.bottom].length / rate;
+			  // setTimeout(renderFrame, time, frame, paramObj);
+        renderFrame(frame, paramObj);
+		    }
+	    }
+    }
     // const interval = setInterval(() => {
       // // If there still data available, render from storage
       // if (frame < up) {
