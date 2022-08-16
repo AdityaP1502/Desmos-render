@@ -12,7 +12,7 @@ The edge detection algorithm that is supported is canny edge detection, laplacia
 
 #### 1.1.2 Canny
 
-The canny filter takes two arguments, low threshold and high threshold. Each of them will used an adaptive thresholding where $low\_thresholding= (1- nudge) * median\_pixels$ and $high\_threshold=(1 + nudge) * median\_pixels$.
+The canny filter takes two arguments, low threshold and high threshold. Each of them will used an adaptive thresholding where $lowThresholding= (1- nudge) * medianPixels$ and $highThreshold=(1 + nudge) * medianPixels$.
 
-![original images](\img\original.jpg)
-![canny edge detection using simple Threshold method](\img\canny-original.jpg)
+![original images](img/original.jpg)
+![canny edge detection using simple Threshold method](img/canny-original.jpg)
