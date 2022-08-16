@@ -35,13 +35,18 @@ class Image():
         for j in range(nx):
             self.pixels[i][j] = 1 if self.pixels[i][j] > 127 else 0
 
-    def edge_detect_canny(self, nudge = .33):
+    def edge_detect_canny(self, nudge = .33, THRESHOLD_METHOD="adaptive"):
         """
         Edge detect images using canny filter
         """
         # convert to gryscale
         self.pixels = cv2.cvtColor(self.pixels, cv2.COLOR_BGR2GRAY)
-        self.__threshold(["simple", cv2.THRESH_TOZERO])
+        
+        if THRESHOLD_METHOD == "simple":
+          self.__threshold(["simple", cv2.THRESH_TOZERO])
+          
+        elif THRESHOLD_METHOD == "adaptive":
+          self.__threshold(["adaptive"])
 
         # img_gray = cv2.GaussianBlur(img_gray, (3, 3), 0.5)
         
@@ -60,12 +65,23 @@ class Image():
         # filter the image using filter2D
         self.pixels = cv2.Canny(image=self.pixels, threshold1=low, threshold2=high)
 
-    def edge_detect_laplacian(self, BLUR_STRENGTH = 0):
+    def edge_detect_laplacian(self, BLUR_STRENGTH = 0, THRESHOLD_METHOD="simple"):
+        """Edge detect using laplacian filter
+
+        Args:
+            BLUR_STRENGTH (int, optional): Specify the strength of gaussian blur. Defaults to 0.
+            THRESHOLD_METHOD (str, optional): Threshold method: 1. Simple : Simple Threshold. Used CV2.THRESH_TRUNC
+                                                                2. Adaptive : Adaptive Tresholding. Defaults to "simple".
+        """
         # convert to gryscale
         self.pixels = cv2.cvtColor(self.pixels, cv2.COLOR_BGR2GRAY)
 
         # thereshold the images
-        self.__threshold(["simple", cv2.THRESH_TRUNC])
+        if THRESHOLD_METHOD == "simple":
+          self.__threshold(["simple", cv2.THRESH_TRUNC])
+          
+        elif THRESHOLD_METHOD == "adaptive":
+          self.__threshold(["adaptive"])
 
         # Blur the images
         self.pixels = cv2.GaussianBlur(self.pixels, (3, 3), BLUR_STRENGTH)
@@ -87,13 +103,21 @@ class Image():
               self.pixels[i][j] = 255 if self.pixels[i][j] > 10 else 127
         
     @classmethod             
-    def edge_detect_combine_method(cls, filename, factor=0.5):
+    def edge_detect_combine_method(cls, filename, ACCURATE_RENDER, factor=0.5):
         img1 = cls(filename=filename)
         img2 = cls(filename=filename)
-        
         img_combine = []
-        img1.edge_detect_canny()
-        img2.edge_detect_laplacian(BLUR_STRENGTH=0.2)
+        
+        TH_1 = "simple"
+        TH_2 = "simple"
+        
+        if ACCURATE_RENDER:
+          # able to detect lot more edges in a pictures
+          # end result can be noisy
+          TH_2 = "adaptive"
+          
+        img1.edge_detect_canny(THRESHOLD_METHOD=TH_1)
+        img2.edge_detect_laplacian(BLUR_STRENGTH=0.2, THRESHOLD_METHOD=TH_2)
         
         ny, nx = np.shape(img1.pixels) # must have the same dimensions
         for i in range(ny):
@@ -143,18 +167,18 @@ class Image():
       
       
     @classmethod
-    def getLatexExpression(cls, filename, method):
+    def getLatexExpression(cls, filename, method, THRESHOLD_METHOD, ACCURATE_RENDER):
       if method == "canny":
         img = Image(filename)
-        img.edge_detect_canny()
+        img.edge_detect_canny(THRESHOLD_METHOD=THRESHOLD_METHOD)
         
         
       elif method == "laplacian":
         img = Image(filename)
-        img.edge_detect_laplacian(BLUR_STRENGTH=0.2)
+        img.edge_detect_laplacian(BLUR_STRENGTH=0.2, THRESHOLD_METHOD=THRESHOLD_METHOD)
         
       elif method == "combine":
-        img = Image.edge_detect_combine_method(filename, factor=0.3)
+        img = Image.edge_detect_combine_method(filename, factor=0.3, ACCURATE_RENDER=ACCURATE_RENDER)
     
       else:
         raise Exception("invalid edge detect method. Method isn't supported")
