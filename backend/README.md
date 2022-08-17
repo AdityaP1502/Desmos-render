@@ -1,5 +1,5 @@
 # Backend connection
-To run the backend connection without processing the frame can achieved by running this command in directory contains backend folder. 
+To run the backend connection without processing the frames can be achieved by running this command in the root directory.  
 ```shell
 node ./backend/server.js <in_path> <out_path> <total_frames> <batch_size> [start_frame]
 ```
@@ -12,4 +12,4 @@ node ./backend/server.js <in_path> <out_path> <total_frames> <batch_size> [start
 | batch_size | total block of latex file that sent to the front end |
 | start_frame(optional) | Specify which frame is the starting frame. Default is 1.|
 
-## Notes : Please make sure directory specify in in_path and out_path exist. If not, error will occur. 
+## Notes : Please make sure in_path and out_path directory exits. If not, error will occur. 
