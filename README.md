@@ -16,9 +16,9 @@ The canny filter takes two arguments, low threshold and high threshold. Each of 
 
 Before the images goes to the canny filter, it goes to a few preprocessing layer such as gaussian filter to filter out the noise, bilateral filter to smoothen the filter and threshold the images. Threshold images can be done using two methods : simple and adaptive. 
 __Threshold Method__:
-\
+</br>
 For simple, the kernel is cv2.THRESH_TOZERO
-\
+</br>
 For adaptive, the kernel is cv2.ADAPTIVE_THRESH_GAUSSIAN_C and cv2.THRESH_BINARY
 
 ##### 1.1.1.1 Canny Edge Detection Result
@@ -30,9 +30,9 @@ For adaptive, the kernel is cv2.ADAPTIVE_THRESH_GAUSSIAN_C and cv2.THRESH_BINARY
 Laplacian takes kzize as argument. ksize specifies the kernel size use to do the filtering. 
 Like canny method, before process occurs, the images goes to preprocessing layers like stated in canny filter in 1.1.2. 
 __Threshold Method__:
-\
+</br>
 For simple, the kernel is cv2.THRESH_TRUNC
-\
+</br>
 For adaptive, the kernel is cv2.ADAPTIVE_THRESH_GAUSSIAN_C and cv2.THRESH_BINARY
 
 ##### 1.1.2.1 Laplacian Edge Detection Result 
@@ -43,9 +43,9 @@ For adaptive, the kernel is cv2.ADAPTIVE_THRESH_GAUSSIAN_C and cv2.THRESH_BINARY
 ### 1.1.3 Combine
 Combine use laplacian and canny filter. Then the result will be a weighted average of laplacian result and canny result. The weight of the filter is specified in factor parameter. 
 __Accurate Render Parameters__:
-\
+</br>
 If accurate render is not set, then each filter will use simple threshold method. 
-\
+</br>
 if accurate render is set, then laplacian filter will use adaptive threshold method and canny still use simple method. 
 ##### 1.1.3.1 Laplacian Edge Detection Result 
 ![original images](img/original.jpg)
