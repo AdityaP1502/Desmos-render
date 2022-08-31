@@ -53,14 +53,20 @@ if accurate render is set, then laplacian filter will use adaptive threshold met
 ![combine edge detection using accurate render](img/combine-accurate-render.jpg)
 
 ## 2. Requirements
+### Install Dependencies
+```shell
+sudo apt install git python3-dev python3-pip build-essential libagg-dev libpotrace-dev pkg-config
+```
+### Program Requirements
 1. Python 3.8+
 2. FFMPEG
 3. yt-dlp (https://github.com/yt-dlp/yt-dlp)
 ### Python Library
-1. potrace
+1. pypotrace
 2. numpy
-3. opencv
+3. opencv-python
 
+__Notes__ : For windows user, can try running the script via wsl. 
 ## 3. Running
 Here is how to run the script
 ```shell
